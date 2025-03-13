@@ -90,7 +90,15 @@ abstract class EpubContentFileRef {
     try {
       // 앱 내 로컬 저장소 경로 가져오기
       final directory = await getApplicationDocumentsDirectory();
-      final filePath = '${directory.path}/$fileName';
+      final folderPath = '${directory.path}/images'; // 'images' 폴더 내 저장
+
+      // 디렉토리 생성 (존재하지 않을 경우)
+      final folder = Directory(folderPath);
+      if (!await folder.exists()) {
+        await folder.create(recursive: true);
+      }
+
+      final filePath = '$folderPath/$fileName';
 
       // 파일 저장
       final file = File(filePath);
