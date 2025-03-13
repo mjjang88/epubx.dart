@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert' as convert;
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:path_provider/path_provider.dart';
 import 'package:quiver/core.dart';
 
 import '../entities/epub_content_type.dart';
@@ -73,5 +75,31 @@ abstract class EpubContentFileRef {
     var contentStream = getContentStream();
     var result = convert.utf8.decode(contentStream);
     return result;
+  }
+
+  Future<String> readAndSaveContent(String fileName) async {
+    // EPUB 데이터를 Uint8List로 가져오기
+    var contentFileEntry = getContentFileEntry();
+    Uint8List contentBytes = Uint8List.fromList(openContentStream(contentFileEntry));
+
+    // 로컬 저장소에 저장 후 경로 반환
+    return await saveContentToFile(contentBytes, fileName);
+  }
+
+  Future<String> saveContentToFile(Uint8List content, String fileName) async {
+    try {
+      // 앱 내 로컬 저장소 경로 가져오기
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/$fileName';
+
+      // 파일 저장
+      final file = File(filePath);
+      await file.writeAsBytes(content, flush: true);
+
+      return filePath; // 저장된 파일의 경로 반환
+    } catch (e) {
+      print("Error saving file: $e");
+      return ''; // 오류 발생 시 빈 문자열 반환
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:epubx/src/entities/epub_image_content_file.dart';
 import 'package:quiver/collection.dart' as collections;
 import 'package:quiver/core.dart';
 
@@ -8,14 +9,14 @@ import 'epub_text_content_file.dart';
 class EpubContent {
   Map<String, EpubTextContentFile>? Html;
   Map<String, EpubTextContentFile>? Css;
-  Map<String, EpubByteContentFile>? Images;
+  Map<String, EpubImageContentFile>? Images;
   Map<String, EpubByteContentFile>? Fonts;
   Map<String, EpubContentFile>? AllFiles;
 
   EpubContent() {
     Html = <String, EpubTextContentFile>{};
     Css = <String, EpubTextContentFile>{};
-    Images = <String, EpubByteContentFile>{};
+    Images = <String, EpubImageContentFile>{};
     Fonts = <String, EpubByteContentFile>{};
     AllFiles = <String, EpubContentFile>{};
   }

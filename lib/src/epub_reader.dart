@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:archive/archive.dart';
+import 'package:epubx/src/entities/epub_image_content_file.dart';
 
 import 'entities/epub_book.dart';
 import 'entities/epub_byte_content_file.dart';
@@ -99,7 +100,7 @@ class EpubReader {
     var result = EpubContent();
     result.Html = await readTextContentFiles(contentRef.Html!);
     result.Css = await readTextContentFiles(contentRef.Css!);
-    result.Images = await readByteContentFiles(contentRef.Images!);
+    result.Images = await readImageContentFiles(contentRef.Images!);
     result.Fonts = await readByteContentFiles(contentRef.Fonts!);
     result.AllFiles = <String, EpubContentFile>{};
 
@@ -110,7 +111,7 @@ class EpubReader {
       result.AllFiles![key!] = value;
     });
 
-    result.Images!.forEach((String? key, EpubByteContentFile value) {
+    result.Images!.forEach((String? key, EpubImageContentFile value) {
       result.AllFiles![key!] = value;
     });
     result.Fonts!.forEach((String? key, EpubByteContentFile value) {
@@ -160,6 +161,27 @@ class EpubReader {
     result.ContentType = contentFileRef.ContentType;
     result.ContentMimeType = contentFileRef.ContentMimeType;
     result.Content = await contentFileRef.readContentAsBytes();
+
+    return result;
+  }
+
+  static Future<Map<String, EpubImageContentFile>> readImageContentFiles(
+      Map<String, EpubByteContentFileRef> byteContentFileRefs) async {
+    var result = <String, EpubImageContentFile>{};
+    await Future.forEach(byteContentFileRefs.keys, (dynamic key) async {
+      result[key] = await readImageContentFile(byteContentFileRefs[key]!);
+    });
+    return result;
+  }
+
+  static Future<EpubImageContentFile> readImageContentFile(
+      EpubContentFileRef contentFileRef) async {
+    var result = EpubImageContentFile();
+
+    result.FileName = contentFileRef.FileName;
+    result.ContentType = contentFileRef.ContentType;
+    result.ContentMimeType = contentFileRef.ContentMimeType;
+    result.imagePath = await contentFileRef.readAndSaveContent(result.FileName!);
 
     return result;
   }
