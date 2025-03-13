@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:quiver/core.dart';
 
@@ -88,6 +89,9 @@ abstract class EpubContentFileRef {
 
   Future<String> saveContentToFile(Uint8List content, String fileName) async {
     try {
+      // 파일명에서 경로 제거 (파일명만 추출)
+      final pureFileName = path.basename(fileName);
+
       // 앱 내 로컬 저장소 경로 가져오기
       final directory = await getApplicationDocumentsDirectory();
       final folderPath = '${directory.path}/images'; // 'images' 폴더 내 저장
@@ -98,7 +102,7 @@ abstract class EpubContentFileRef {
         await folder.create(recursive: true);
       }
 
-      final filePath = '$folderPath/$fileName';
+      final filePath = '$folderPath/$pureFileName';
 
       // 파일 저장
       final file = File(filePath);
